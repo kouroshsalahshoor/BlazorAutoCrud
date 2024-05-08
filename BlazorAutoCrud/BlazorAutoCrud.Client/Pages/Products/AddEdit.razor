@@ -1,0 +1,56 @@
+﻿@page "/product/create"
+@page "/product/edit/{id:int}"
+
+<h3 class="bg-@(Id > 0? "warning text-light" : "light")">@(Id > 0 ? "Edit" : "Create")</h3>
+
+<EditForm Model="_model" OnValidSubmit="validSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="Id" class="form-label">Name</label>
+        <InputNumber class="form-control" id="Id" @bind-Value="@_model.Id" disabled="true" />
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Name</label>
+        <InputText class="form-control" id="Name" placeholder="Name" @bind-Value="_model.Name" />
+        <ValidationMessage For="()=>_model.Name" />
+    </div>
+    <div class="mb-3">
+        <label for="Quantity" class="form-label">Quantity</label>
+        <InputNumber class="form-control" id="Quantity" @bind-Value="_model.Quantity" />
+        <ValidationMessage For="()=>_model.Quantity" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a class="btn btn-light" href="/products">Back to list</a>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private Product _model { get; set; } = new();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
+        {
+            _model = await _productService.Get(Id) ?? new();
+        }
+    }
+
+    private async Task validSubmit()
+    {
+        if (Id > 0)
+        {
+            await _productService.Update(_model);
+        }
+        else
+        {
+            await _productService.Add(_model);
+        }
+
+        _navigationManager.NavigateTo("products");
+    }
+}
