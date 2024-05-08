@@ -13,7 +13,7 @@ namespace BlazorAutoCrud.Repositories
         {
             _db = db;
         }
-        public async Task<List<Product>> Get()
+        public async Task<List<Product>?> Get()
         {
             return await _db.Products.ToListAsync();
         }
