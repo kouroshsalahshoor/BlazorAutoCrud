@@ -1,6 +1,7 @@
 using BlazorAutoCrud.Components;
 using BlazorAutoCrud.Data;
 using BlazorAutoCrud.Repositories;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Shared.IRepositories;
 
