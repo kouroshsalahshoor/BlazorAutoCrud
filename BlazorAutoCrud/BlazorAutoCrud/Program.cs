@@ -1,7 +1,8 @@
-using BlazorAutoCrud.Client.Pages;
 using BlazorAutoCrud.Components;
 using BlazorAutoCrud.Data;
+using BlazorAutoCrud.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Shared.IRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +11,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+builder.Services.AddControllers();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
@@ -32,6 +37,8 @@ else
 
 app.UseHttpsRedirection();
 
+app.MapControllers();
+
 app.UseStaticFiles();
 app.UseAntiforgery();
 
@@ -43,7 +50,7 @@ app.MapRazorComponents<App>()
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
-    if (db is not null && db.Database.GetPendingMigrations().Any()) {  db.Database.Migrate(); }
+    if (db is not null && db.Database.GetPendingMigrations().Any()) { db.Database.Migrate(); }
 }
 
 app.Run();
